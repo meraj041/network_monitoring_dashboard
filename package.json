@@ -1,0 +1,27 @@
+{
+  "name": "meraj",
+  "version": "10.9.2",
+  "description": "experiencing",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meraj041/network-monitoring-dashboard.git"
+  },
+  "keywords": [
+    "network",
+    "monitorig",
+    "dashboard"
+  ],
+  "author": "Meraj",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/meraj041/network-monitoring-dashboard/issues"
+  },
+  "homepage": "https://github.com/meraj041/network-monitoring-dashboard#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

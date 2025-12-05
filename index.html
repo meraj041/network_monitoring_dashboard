@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Network Monitoring Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f2f5;
+    }
+    header {
+      background-color: #1e293b;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .dashboard {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    canvas {
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Network Monitoring Dashboard</h1>
+  </header>
+
+  <main class="dashboard">
+    <div class="card">
+      <h2>Live Ping Latency</h2>
+      <canvas id="pingChart"></canvas>
+    </div>
+    <div class="card">
+      <h2>System Info</h2>
+      <p><strong>Device IP:</strong> 192.168.0.102</p>
+      <p><strong>MAC Address:</strong> 00:1A:2B:3C:4D:5E</p>
+      <p><strong>Uptime:</strong> <span id="uptime"></span></p>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const ctx = document.getElementById('pingChart').getContext('2d');
+      const pingChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: []
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Latency (ms)'
+              }
+            }
+          }
+        }
+      });
+
+      const hosts = ['8.8.8.8', '1.1.1.1'];
+      hosts.forEach((host) => {
+        pingChart.data.datasets.push({
+          label: host,
+          data: [],
+          borderColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
+          fill: false
+        });
+      });
+
+      async function fetchPing() {
+        const res = await fetch('/ping');
+        const data = await res.json();
+        const timestamp = new Date().toLocaleTimeString();
+        pingChart.data.labels.push(timestamp);
+
+        data.forEach((entry, index) => {
+          pingChart.data.datasets[index].data.push(entry.time);
+        });
+
+        if (pingChart.data.labels.length > 10) {
+          pingChart.data.labels.shift();
+          pingChart.data.datasets.forEach(ds => ds.data.shift());
+        }
+
+        pingChart.update();
+      }
+
+      setInterval(fetchPing, 5000);
+
+      const startTime = new Date();
+      setInterval(() => {
+        const now = new Date();
+        const uptime = new Date(now - startTime);
+        const hours = uptime.getUTCHours();
+        const minutes = uptime.getUTCMinutes();
+        const seconds = uptime.getUTCSeconds();
+        document.getElementById('uptime').textContent = `${hours}h ${minutes}m ${seconds}s`;
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
